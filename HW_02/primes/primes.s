@@ -33,11 +33,9 @@ is_prime:                                        # uint32_t is_prime(uint32_t);
   cmp $2, %rdi
   je prime
 
-  push %rdi
   call aprox_int_sqrt 
   movq %rax, %rbx
   add $1, %rbx
-  pop %rdi
 
 ploop:
   sub $1, %rbx
