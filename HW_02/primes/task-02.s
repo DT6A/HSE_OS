@@ -2,30 +2,25 @@
 
   .text
 
-aprox_int_sqrt:
-  push %rbx
+aprox_int_sqrt:                                  # uint32_t
   mov $0, %eax
 
 sqloop:
-  push %rax
-  movq %rax, %rbx
-  mulq %rbx
-  movq %rax, %rbx
-  pop %rax
-  cmp %rdi, %rbx
+  pushq %rax
+  movq %rax, %rdx
+  mulq %rdx
+  movq %rax, %rdx
+  popq %rax
+  cmp %rdi, %rdx
   jge sqend
   add $1, %eax
   jmp sqloop
 
 sqend:
-  pop %rbx
   ret
 
 
-is_prime:                                        # uint32_t is_prime(uint32_t);
-  push %rbx
-  push %rdx
-
+is_prime:                                        # uint32_t is_prime(uint32_t);  
   cmp $0, %rdi                                   # Check 0, 1, 2
   je nprime
   cmp $1, %rdi
@@ -34,16 +29,16 @@ is_prime:                                        # uint32_t is_prime(uint32_t);
   je prime
 
   call aprox_int_sqrt 
-  movq %rax, %rbx
-  add $1, %rbx
+  movq %rax, %r8
+  add $1, %r8
 
 ploop:
-  sub $1, %rbx
-  cmp $1, %rbx
+  sub $1, %r8
+  cmp $1, %r8
   je prime
   movq %rdi, %rax
   xor %rdx, %rdx
-  div %rbx
+  div %r8
   cmp $0, %rdx
   je nprime
   jmp ploop
@@ -57,16 +52,12 @@ nprime:
   jmp pret
 
 pret:
-  pop %rdx
-  pop %rbx
   ret
 
 
 product_of_min_and_max_primes:                   # uint64_t product_of_min_and_max_primes(const uint32_t *data, uint32_t size);
-  push %rbx
-  push %rcx
-  push %r8
-
+  pushq %rbx                                     # stack align -8
+  
   movq $0, %rbx
   mov $4294967295, %ecx
 
@@ -78,7 +69,9 @@ mloop:
   je mret
 
   mov (%r8), %edi
+  pushq %r8                                      # stack align -16, fine
   call is_prime
+  popq %r8
   cmp $0, %eax
   je mloope
 
@@ -100,7 +93,5 @@ mret:
   movq %rcx, %rax
   mulq %rbx
 
-  pop %r8
-  pop %rcx
-  pop %rbx
+  popq %rbx
   ret

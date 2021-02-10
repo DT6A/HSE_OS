@@ -9,7 +9,7 @@
 
   .text
 print_hello:                   # void print_hello(const char *name);
-  push %rdi
+  pushq %rdi
 
   sub $8, %rsp
   movq stdout, %rsi
@@ -17,7 +17,7 @@ print_hello:                   # void print_hello(const char *name);
   call fputs
   add $8, %rsp
 
-  pop %rdi
+  popq %rdi
   movq stdout, %rsi
   call fputs
 

@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-gcc -no-pie primes.s main.c -o test
+gcc -no-pie task-02.s main.c -o test
