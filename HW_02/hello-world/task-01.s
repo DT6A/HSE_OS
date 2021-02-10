@@ -9,12 +9,13 @@
 
   .text
 print_hello:                   # void print_hello(const char *name);
-  push %rsi
   push %rdi
 
+  sub $8, %rsp
   movq stdout, %rsi
   movq $.Lstr_start, %rdi
   call fputs
+  add $8, %rsp
 
   pop %rdi
   movq stdout, %rsi
@@ -24,5 +25,4 @@ print_hello:                   # void print_hello(const char *name);
   movq stdout, %rsi
   call fputs
 
-  pop %rsi
   ret

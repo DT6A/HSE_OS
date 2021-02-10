@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-gcc -no-pie hello.s main.c -o hello
+gcc -no-pie task-01.s main.c -o hello
