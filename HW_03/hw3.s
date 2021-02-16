@@ -8,7 +8,7 @@ write_to_file:                   # bool write_to_file(const char *path, const ch
   pushq %rsi                     # need it twice
 
   movq $2, %rax                  # open system call
-  movq $01101, %rsi              # flags create if needed (00100) + truncate (01000)
+  movq $01101, %rsi              # flags create if needed (00100) + truncate (01000) + write (00001)
   movq $0644, %rdx               # mode
  
   syscall                        # open file
