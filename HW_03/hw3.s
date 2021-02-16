@@ -33,7 +33,7 @@ write_to_file:                   # bool write_to_file(const char *path, const ch
   popq %rdx                      # restore length
   movq $1, %rcx                  # successfull termination
   cmp %rax, %rdx                 # compare length and number of bytes writen
-  je write_ret                    # if same finish with success
+  je write_ret                   # if same finish with success
   movq $0, %rcx                  # unsuccessfull termnination
   jmp write_ret
     
@@ -44,7 +44,7 @@ fail_ret:                        ### return 0 as result
   movq $0, %rax
   ret
 
-write_ret:                        ### close file and return result
+write_ret:                       ### close file and return result
   movq $3, %rax                  # close system call
   popq %rdi                      # get file descriptor
   pushq %rcx                     # store result
