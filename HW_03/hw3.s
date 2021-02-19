@@ -52,5 +52,13 @@ write_ret:                       ### close file and return result
   syscall                        # close file
   add $8, %rsp                   # restore stack
 
+  cmp $0, %rax
+  je succ_closed                 # file successfully closed
+
+  movq $0, %rax                  # failed to close file
+  popq %rcx
+  ret
+
+succ_closed:
   popq %rax                      # return result
   ret
