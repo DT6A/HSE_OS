@@ -14,7 +14,7 @@ write_to_file:                   # bool write_to_file(const char *path, const ch
   syscall                        # open file
  
   cmp $0, %rax                   # check if failed
-  jle fail_ret
+  jl fail_ret
 
   popq %rdi                      # restore text
   pushq %rax                     # store file descriptor
