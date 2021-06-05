@@ -1,7 +1,3 @@
-//
-// Created by tarasov on 05.06.2021.
-//
-
 #include <stdexcept>
 #include <zconf.h>
 

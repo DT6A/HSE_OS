@@ -1,7 +1,3 @@
-//
-// Created by tarasov on 05.06.2021.
-//
-
 #ifndef HW_06_CLI_HPP
 #define HW_06_CLI_HPP
 
@@ -23,7 +19,6 @@ private:
   } mode = NONE;
   string archive = "";
   string directory = "./";
-
 };
 
 
