@@ -1,19 +1,10 @@
-#include <iostream>
-#include <fstream>
+#include "CLI.hpp"
 
-#include "FileContainer.hpp"
-#include "Tar.hpp"
 using namespace std;
 
-int main()
+int main(int argc, char **argv)
 {
-  Tar t;
-  string dir = "test-dir/";
-  string target = "test-dir.tar";
-  string out = "output-dir/";
-
-  //t.create(dir, target);
-  t.extract(target, out);
-
+  CLI cli(argc, argv);
+  cli.run();
   return 0;
 }

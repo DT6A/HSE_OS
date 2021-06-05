@@ -95,19 +95,21 @@ void Tar::restoreFiles(string &path)
   {
     if (S_ISDIR(container.stats.st_mode))
     {
-      if (mkdir((path + container.name).c_str(),  container.stats.st_mode) != 0) throw runtime_error("Failed to create directory " + to_string(errno));
-      if (chown((path + container.name).c_str(), container.stats.st_uid, container.stats.st_gid) != 0) throw runtime_error("Failed to change directory's owners " + to_string(errno));
-    }
-    else if (S_ISLNK(container.stats.st_mode))
+      if (mkdir((path + container.name).c_str(), container.stats.st_mode) != 0)
+        throw runtime_error("Failed to create directory " + to_string(errno));
+      if (chown((path + container.name).c_str(), container.stats.st_uid, container.stats.st_gid) != 0)
+        throw runtime_error("Failed to change directory's owners " + to_string(errno));
+    } else if (S_ISLNK(container.stats.st_mode))
     {
-      if (symlink(container.data, (path + container.name).c_str()) == -1) throw runtime_error("Failed to create sym link " + to_string(errno));
-    }
-    else if (S_ISFIFO(container.stats.st_mode))
+      if (symlink(container.data, (path + container.name).c_str()) == -1)
+        throw runtime_error("Failed to create sym link " + to_string(errno));
+    } else if (S_ISFIFO(container.stats.st_mode))
     {
-      if (mkfifo((path + container.name).c_str(), container.stats.st_mode) == -1) throw runtime_error("Failed to create FIFO " + to_string(errno));
-      if (chown((path + container.name).c_str(), container.stats.st_uid, container.stats.st_gid) != 0) throw runtime_error("Failed to change FIFO's owners " + to_string(errno));
-    }
-    else
+      if (mkfifo((path + container.name).c_str(), container.stats.st_mode) == -1)
+        throw runtime_error("Failed to create FIFO " + to_string(errno));
+      if (chown((path + container.name).c_str(), container.stats.st_uid, container.stats.st_gid) != 0)
+        throw runtime_error("Failed to change FIFO's owners " + to_string(errno));
+    } else
     {
       int fileDescr;
       if (ino2file.find(container.stats.st_ino) == ino2file.end())
@@ -115,48 +117,29 @@ void Tar::restoreFiles(string &path)
         fileDescr = open((path + container.name).c_str(), O_RDWR | O_CREAT | O_TRUNC,
                          container.stats.st_mode);
         ino2file[container.stats.st_ino] = container.name;
-        if (write(fileDescr, container.data, container.stats.st_size) == -1) throw runtime_error("Error while writing content to file " + to_string(errno));
-      }
-      else
+        if (write(fileDescr, container.data, container.stats.st_size) == -1)
+          throw runtime_error("Error while writing content to file " + to_string(errno));
+      } else
       {
         if (link((path + ino2file[container.stats.st_ino]).c_str(),
-                (path + container.name).c_str()) != 0) throw runtime_error("Failed to create hard link " + to_string(errno));
+                 (path + container.name).c_str()) != 0)
+          throw runtime_error("Failed to create hard link " + to_string(errno));
         fileDescr = open((path + container.name).c_str(), O_RDWR);
       }
       if (fileDescr == -1)
         throw runtime_error("Failed to create output file " + to_string(errno));
-      if (fchown(fileDescr, container.stats.st_uid, container.stats.st_gid) != 0) throw runtime_error("Failed to change file's owners " + to_string(errno));
+      if (fchown(fileDescr, container.stats.st_uid, container.stats.st_gid) != 0)
+        throw runtime_error("Failed to change file's owners " + to_string(errno));
       if (close(fileDescr) != 0) throw runtime_error("Failure while closing file" + to_string(errno));
     }
   }
   for (auto i = containers.rbegin(); i != containers.rend(); ++i)
   {
     FileContainer &container = *i;
-    if (S_ISDIR(container.stats.st_mode))
-    {
-      struct timespec buf[2] = {container.stats.st_atim, container.stats.st_mtim};
-      // ТУТ ПОЧЕМУ-ТО ОНО СТАВИТ ВРЕМЯ НА НУЖНЕ (ЕСЛИ ИДТИ ДЕБАГЕРОМ), НО КОГДА ПЕРЕХОДИТ НА СЛЕДУЮЩУЮ ИТЕРАЦИЮ ЦИКЛА ОДНО ИЗ ВРЕМЕН СБИВАЕТСЯ НА ТЕКУЩЕЕ, И ЭТА ПРОБЛЕМА КАЖЕТСЯ НЕ ТОЛЬКО В ЭТОМ МЕСТЕ
-      // СУПЕР КЛАСС ПРОСТО 10/10 Я ПОНЯЛ ЧТО БОЛЬШЕ В СВОЕЙ ЖИЗНИ ТРОГАТЬ ЭТО НЕ ХОЧУ ВОТ СОВСЕМ
-      if (utimensat(AT_FDCWD, (path + container.name).c_str(), buf,0) != 0) throw runtime_error("Failed to modify directory times " + to_string(errno));
-    }
-    else if (S_ISLNK(container.stats.st_mode) || S_ISFIFO(container.stats.st_mode))
-    {
-      struct timeval buf[2];
-      // Я НЕНАВИЖУ ЭТО КРИВУЩЕЕ АПИ, ОНО НЕ РАБОТАЕТ ЕСЛИ USEC НЕ 0!!!!!!!!!!!!!!!!!!!!!!
-      buf[0].tv_sec = container.stats.st_atim.tv_sec;
-      buf[0].tv_usec = 0;
-      buf[1].tv_sec = container.stats.st_mtim.tv_sec;
-      buf[1].tv_usec = 0;
-      if (lutimes((path + container.name).c_str(), buf) != 0) throw runtime_error("Failed to modify sym link's times " + to_string(errno));
-    }
-    else
-    {
-      int fileDescr = open((path + container.name).c_str(), O_RDWR);
-      if (fileDescr == -1)
-        throw runtime_error("Failed to create output file " + to_string(errno));
-      struct timespec buf[2] = {container.stats.st_atim, container.stats.st_mtim};
-      if (futimens(fileDescr, buf) != 0) throw runtime_error("Failed to modify file times" + to_string(errno));
-      if (close(fileDescr) != 0) throw runtime_error("Failure while closing file" + to_string(errno));
-    }
+    struct timespec buf[2] = {container.stats.st_atim, container.stats.st_mtim};
+    // ТУТ ПОЧЕМУ-ТО ОНО СТАВИТ ВРЕМЯ НА НУЖНЕ (ЕСЛИ ИДТИ ДЕБАГЕРОМ), НО КОГДА ПЕРЕХОДИТ НА СЛЕДУЮЩУЮ ИТЕРАЦИЮ ЦИКЛА ACCESS СБИВАЕТСЯ НА ТЕКУЩЕЕ, И ЭТА ПРОБЛЕМА КАЖЕТСЯ НЕ ТОЛЬКО С ЭТОЙ ФУНКЦИЕЙ
+    // СУПЕР КЛАСС ПРОСТО 10/10 Я ПОНЯЛ ЧТО БОЛЬШЕ В СВОЕЙ ЖИЗНИ ТРОГАТЬ ЭТО НЕ ХОЧУ ВОТ СОВСЕМ
+    if (utimensat(AT_FDCWD, (path + container.name).c_str(), buf, AT_SYMLINK_NOFOLLOW) != 0)
+      throw runtime_error("Failed to modify directory times " + to_string(errno));
   }
 }
