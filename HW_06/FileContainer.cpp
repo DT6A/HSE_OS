@@ -57,7 +57,7 @@ void FileContainer::loadFromFile(int fd, unordered_map<string, string> &inos)
   int br = read(fd, buf, nameSize);
   if (br == -1) throw runtime_error("Error while reading from file");
   name = buf;
-  delete[] buf;
+  //delete[] buf;
   if (read(fd, reinterpret_cast<char *>(&stats), sizeof(stats)) == -1) throw runtime_error("Error while reading from file");
   if (inos.find(getIno()) == inos.end())
   {
@@ -76,6 +76,5 @@ string FileContainer::getIno()
 
 FileContainer::~FileContainer()
 {
-  if (data != nullptr)
-    delete[] data;
+  delete[] data;
 }

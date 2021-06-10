@@ -14,7 +14,7 @@ class FileContainer
 public:
   string name;
   struct stat stats;
-  char *data;
+  char *data = nullptr;
 
   FileContainer() = default;
   explicit FileContainer(string &path, string &rootDir);

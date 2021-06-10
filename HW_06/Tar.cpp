@@ -60,6 +60,7 @@ void Tar::saveToTarget(string &target, string &rootDir)
     throw runtime_error("Failed to write to target file " + to_string(errno));
   for (string &name : names)
   {
+    //cout << name << endl;
     FileContainer fc(name, rootDir);
     if (ino2file.find(fc.getIno()) == ino2file.end())
     {
