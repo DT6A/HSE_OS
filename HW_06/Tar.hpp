@@ -19,7 +19,8 @@ public:
 private:
   vector<string> names;
   vector<FileContainer> containers;
-  unordered_map<__ino_t, string> ino2file;
+  unordered_map<string, string> ino2file;
+  unordered_map<string, size_t> file2container;
 
   void collectNames(string &path, string &rootDir, string prefix="");
   void saveToTarget(string &target, string &rootDir);
