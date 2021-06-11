@@ -31,8 +31,7 @@ FileContainer::FileContainer(string &path, string &rootDir)
     if (fd == -1)
       throw runtime_error("Failed to create output file");
     if (read(fd, data, stats.st_size) != stats.st_size) throw runtime_error("Failed to read file content");
-    if (close(fd) != 0)
-      throw runtime_error("Failure while closing file");
+    if (close(fd) != 0) throw runtime_error("Failure while closing file");
   }
 }
 
@@ -57,7 +56,6 @@ void FileContainer::loadFromFile(int fd, unordered_map<string, string> &inos)
   int br = read(fd, buf, nameSize);
   if (br == -1) throw runtime_error("Error while reading from file");
   name = buf;
-  //delete[] buf;
   if (read(fd, reinterpret_cast<char *>(&stats), sizeof(stats)) == -1) throw runtime_error("Error while reading from file");
   if (inos.find(getIno()) == inos.end())
   {

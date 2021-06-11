@@ -6,7 +6,6 @@
 
 #include "Tar.hpp"
 
-
 // НЕ НАДО ЧИТАТЬ ЭТОТ КОД, ЕСЛИ НЕ ХОТИТЕ РАЗОЧАРОВАТЬСЯ В ЧЕЛОВЕЧЕСТВЕ
 
 
@@ -34,8 +33,7 @@ void Tar::collectNames(string &dir, string &rootDir, string prefix)
     if (dn == "." || dn == "..") continue;
     string path = dir + "/" + dn;
     struct stat st;
-    if (lstat(path.c_str(), &st) < 0)
-      throw runtime_error("Failed to read stats about file" + to_string(errno));
+    if (lstat(path.c_str(), &st) < 0) throw runtime_error("Failed to read stats about file" + to_string(errno));
     if (S_ISSOCK(st.st_mode))
       continue;
     names.emplace_back(prefix + dn);
@@ -51,8 +49,7 @@ void Tar::saveToTarget(string &target, string &rootDir)
 {
   int fileDescr = open(target.c_str(), O_RDWR | O_CREAT | O_TRUNC,
           S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-  if (fileDescr == -1)
-    throw runtime_error("Failed to create output file " + to_string(errno));
+  if (fileDescr == -1) throw runtime_error("Failed to create output file " + to_string(errno));
 
   size_t size = names.size();
 
@@ -60,7 +57,6 @@ void Tar::saveToTarget(string &target, string &rootDir)
     throw runtime_error("Failed to write to target file " + to_string(errno));
   for (string &name : names)
   {
-    //cout << name << endl;
     FileContainer fc(name, rootDir);
     if (ino2file.find(fc.getIno()) == ino2file.end())
     {
@@ -70,8 +66,7 @@ void Tar::saveToTarget(string &target, string &rootDir)
     else
       fc.saveToFile(fileDescr, false);
   }
-  if (close(fileDescr) !=0)
-    throw runtime_error("Failure while closing file " + to_string(errno));
+  if (close(fileDescr) !=0) throw runtime_error("Failure while closing file " + to_string(errno));
 }
 
 void Tar::loadFromTarget(string &path, string &target)
@@ -80,8 +75,7 @@ void Tar::loadFromTarget(string &path, string &target)
   if (mkdir(target.c_str(),  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
     throw runtime_error("Failed to create directory " + to_string(errno));
   int fileDescr = open(path.c_str(), O_RDONLY);
-  if (fileDescr == -1)
-    throw runtime_error("Failed to create output file " + to_string(errno));
+  if (fileDescr == -1) throw runtime_error("Failed to create output file " + to_string(errno));
 
   size_t size;
   read(fileDescr, reinterpret_cast<char *>(&size), sizeof(size));
