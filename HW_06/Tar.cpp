@@ -83,7 +83,6 @@ void Tar::loadFromTarget(string &path, string &target)
   for (size_t i = 0; i < size; ++i)
   {
     containers[i].loadFromFile(fileDescr, inos);
-    file2container[containers[i].name] = i;
   }
 
   close(fileDescr);
@@ -110,9 +109,9 @@ void Tar::restoreFiles(string &path)
       }
       else
       {
-        if (symlink(containers[file2container[ino2file[container.getIno()]]].data,
-                (path + container.name).c_str()) == -1)
-          throw runtime_error("Failed to create sym link " + to_string(errno));
+        if (link((path + ino2file[container.getIno()]).c_str(),
+                 (path + container.name).c_str()) != 0)
+          throw runtime_error("Failed to create hard link to sym link" + to_string(errno));
       }
       if (lchown((path + container.name).c_str(), container.stats.st_uid, container.stats.st_gid))
         throw runtime_error("Failed to change sym link's owners " + to_string(errno));
