@@ -146,7 +146,8 @@ void Tar::restoreFiles(string &path)
       if (close(fileDescr) != 0) throw runtime_error("Failure while closing file" + to_string(errno));
     }
     if (!S_ISLNK(container.stats.st_mode))
-      chmod((path + container.name).c_str(), container.stats.st_mode);
+      if (chmod((path + container.name).c_str(), container.stats.st_mode) != 0)
+        throw runtime_error("Failed to change file's permissions " + to_string(errno));
   }
   for (auto i = containers.rbegin(); i != containers.rend(); ++i)
   {
