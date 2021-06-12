@@ -72,8 +72,6 @@ void Tar::saveToTarget(string &target, string &rootDir)
 void Tar::loadFromTarget(string &path, string &target)
 {
   unordered_map<string, string> inos;
-  if (mkdir(target.c_str(),  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
-    throw runtime_error("Failed to create directory " + to_string(errno));
   int fileDescr = open(path.c_str(), O_RDONLY);
   if (fileDescr == -1) throw runtime_error("Failed to create output file " + to_string(errno));
 
